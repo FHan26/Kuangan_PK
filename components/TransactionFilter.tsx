@@ -4,97 +4,121 @@ import Cookies from "js-cookie"
 
 
 interface Props {
-  filter: string
-  setFilter: (value: string) => void
+
+filter:string
+
+setFilter:(value:string)=>void
+
 }
 
 
+
 export default function TransactionFilter({
-  filter,
-  setFilter
-}: Props) {
 
+filter,
 
-  const filters = [
-    "SEMUA",
-    "PEMASUKAN",
-    "PENGELUARAN",
-    "MAKAN",
-    "NONGKRONG",
-    "AKADEMIK",
-    "SKINCARE"
-  ]
+setFilter
 
-
-  function changeFilter(value: string) {
-
-    setFilter(value)
-
-    Cookies.set(
-      "transactionFilter",
-      value,
-      {
-        expires: 30
-      }
-    )
-
-  }
+}:Props){
 
 
 
-  return (
+const filters = [
 
-    <div
-      className="
-      flex
-      gap-3
-      flex-wrap
-      mb-7
-      "
-    >
+"SEMUA",
+"PEMASUKAN",
+"PENGELUARAN",
+"MAKAN",
+"NONGKRONG",
+"AKADEMIK",
+"SKINCARE"
 
-      {
-        filters.map((item) => (
-
-          <button
-
-            key={item}
-
-            onClick={() => changeFilter(item)}
-
-            className={`
-              px-5
-              py-2
-              rounded-full
-              font-semibold
-              transition
-
-              ${
-                filter === item
-
-                ?
-                "bg-blue-700 text-white"
-
-                :
-
-                "bg-slate-200 text-slate-800 hover:bg-slate-300"
-
-              }
-            `}
-
-          >
-
-            {item}
-
-          </button>
+]
 
 
-        ))
-      }
 
 
-    </div>
+function changeFilter(value:string){
 
-  )
+
+setFilter(value)
+
+
+}
+
+
+
+return (
+
+<div
+className="
+flex
+gap-3
+flex-wrap
+mb-5
+"
+>
+
+
+{
+
+filters.map((item)=>(
+
+
+<button
+
+
+key={item}
+
+
+onClick={()=>
+changeFilter(item)
+}
+
+
+
+className={`
+
+px-5
+py-2
+rounded-full
+font-semibold
+
+
+${
+filter===item
+
+?
+
+"bg-blue-700 text-white"
+
+:
+
+"bg-gray-200 text-gray-800"
+
+}
+
+`}
+
+
+>
+
+
+{item}
+
+
+</button>
+
+
+))
+
+
+}
+
+
+</div>
+
+
+)
 
 }
