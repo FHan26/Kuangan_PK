@@ -1,256 +1,463 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import Cookies from "js-cookie"
+import TransactionFilter from "@/components/TransactionFilter"
+
+
 export default function DashboardPage() {
+
+
   const transactions = [
+
     {
-      date: "23 Sep 2026",
-      category: "Makan",
-      type: "Pengeluaran",
-      amount: "Rp 75.000",
+      date:"23 Sep 2026",
+      category:"Makan",
+      type:"Pengeluaran",
+      amount:75000
     },
+
     {
-      date: "22 Sep 2026",
-      category: "Akademik",
-      type: "Pengeluaran",
-      amount: "Rp 500.000",
+      date:"22 Sep 2026",
+      category:"Akademik",
+      type:"Pengeluaran",
+      amount:500000
     },
+
+
     {
-      date: "20 Sep 2026",
-      category: "Internship",
-      type: "Pemasukan",
-      amount: "Rp 2.500.000",
+      date:"20 Sep 2026",
+      category:"Freelance",
+      type:"Pemasukan",
+      amount:2500000
     },
+
+
     {
-      date: "18 Sep 2026",
-      category: "Skincare",
-      type: "Pengeluaran",
-      amount: "Rp 750.000",
-    },
-  ];
+      date:"18 Sep 2026",
+      category:"Skincare",
+      type:"Pengeluaran",
+      amount:750000
+    }
 
+  ]
 
-  return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 p-8">
 
-      {/* Header */}
-      <div className="mb-8">
 
-        <h1 className="text-4xl font-bold text-gray-800">
-          Kuangan 💸
-        </h1>
+  const [filter,setFilter] = useState("SEMUA")
 
-        <p className="text-gray-600 mt-2">
-          Halo Adel 👋, selamat datang kembali.
-          Berikut ringkasan kondisi keuangan Anda.
-        </p>
 
-      </div>
 
+  // Ambil cookie
+  useEffect(()=>{
 
+    const saved =
+      Cookies.get(
+        "transactionFilter"
+      )
 
-      {/* Summary Card */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
+    if(saved){
+      setFilter(saved)
+    }
 
-        {/* Saldo */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl p-6 shadow-xl">
+  },[])
 
-          <p className="text-blue-100">
-            Total Saldo
-          </p>
 
-          <h2 className="text-3xl font-bold mt-3">
-            Rp 1.000.000.000
-          </h2>
 
-          <p className="text-sm mt-3 text-blue-100">
-            Periode September 2026
-          </p>
 
-        </div>
 
+  const filteredTransactions =
+  transactions.filter((item)=>{
 
 
-        {/* Income */}
-        <div className="bg-white rounded-2xl p-6 shadow-lg border-l-4 border-green-500">
+    if(filter==="SEMUA"){
+      return true
+    }
 
-          <p className="text-gray-500">
-            Total Pemasukan
-          </p>
 
-          <h2 className="text-3xl font-bold text-green-600 mt-3">
-            Rp 100.000.000
-          </h2>
+    if(filter==="PEMASUKAN"){
+      return item.type==="Pemasukan"
+    }
 
-          <span className="inline-block mt-3 px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm">
-            ↑ Income
-          </span>
 
-        </div>
+    if(filter==="PENGELUARAN"){
+      return item.type==="Pengeluaran"
+    }
 
 
+    return item.category.toUpperCase()===filter
 
 
-        {/* Expense */}
-        <div className="bg-white rounded-2xl p-6 shadow-lg border-l-4 border-red-500">
+  })
 
-          <p className="text-gray-500">
-            Total Pengeluaran
-          </p>
 
-          <h2 className="text-3xl font-bold text-red-600 mt-3">
-            Rp 5.000.000
-          </h2>
 
 
-          <span className="inline-block mt-3 px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm">
-            ↓ Expense
-          </span>
 
+  const income =
+  transactions
+  .filter(
+    item=>item.type==="Pemasukan"
+  )
+  .reduce(
+    (sum,item)=>sum+item.amount,
+    0
+  )
 
-        </div>
 
 
-      </div>
+  const expense =
+  transactions
+  .filter(
+    item=>item.type==="Pengeluaran"
+  )
+  .reduce(
+    (sum,item)=>sum+item.amount,
+    0
+  )
 
 
 
 
+return (
 
-      {/* Transaction History */}
-      <div className="mt-10 bg-white rounded-2xl shadow-xl p-6">
+<main
+className="
+min-h-screen
+bg-slate-100
+p-8
+text-slate-900
+"
+>
 
 
-        <div className="flex justify-between items-center mb-5">
 
-          <h2 className="text-2xl font-bold text-gray-800">
-            Riwayat Transaksi
-          </h2>
+<h1
+className="
+text-4xl
+font-extrabold
+mb-2
+"
+>
+Kuangan 💸
+</h1>
 
 
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-            + Tambah Transaksi
-          </button>
+<p
+className="
+text-slate-600
+mb-8
+"
+>
+Halo Adel 👋, selamat datang kembali
+</p>
 
 
-        </div>
 
 
 
-        <div className="overflow-x-auto">
+<div
+className="
+grid
+grid-cols-1
+md:grid-cols-3
+gap-6
+"
+>
 
-        <table className="w-full">
 
 
-          <thead>
+<div
+className="
+bg-blue-700
+text-white
+rounded-2xl
+p-7
+shadow-xl
+"
+>
 
-            <tr className="border-b text-gray-500">
+<p>
+Total Saldo
+</p>
 
-              <th className="text-left py-3">
-                Tanggal
-              </th>
 
-              <th className="text-left">
-                Kategori
-              </th>
+<h2
+className="
+text-4xl
+font-bold
+mt-3
+"
+>
+Rp 10.000.000
+</h2>
 
-              <th className="text-left">
-                Jenis
-              </th>
+</div>
 
-              <th className="text-right">
-                Jumlah
-              </th>
 
 
-            </tr>
 
-          </thead>
 
 
 
+<div
+className="
+bg-white
+rounded-2xl
+p-7
+shadow-lg
+border-l-8
+border-green-500
+"
+>
 
-          <tbody>
+<p className="text-gray-500">
+Total Pemasukan
+</p>
 
-          {transactions.map((item,index)=>(
 
-            <tr
-              key={index}
-              className="border-b hover:bg-gray-50"
-            >
+<h2
+className="
+text-3xl
+font-bold
+text-green-600
+mt-3
+"
+>
+Rp {income.toLocaleString("id-ID")}
+</h2>
 
-              <td className="py-4">
-                {item.date}
-              </td>
 
+</div>
 
-              <td>
 
-                <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700">
-                  {item.category}
-                </span>
 
-              </td>
 
 
-              <td>
 
-                {
-                  item.type === "Pemasukan" ? (
 
-                    <span className="text-green-600 font-semibold">
-                      + {item.type}
-                    </span>
 
-                  ) : (
+<div
+className="
+bg-white
+rounded-2xl
+p-7
+shadow-lg
+border-l-8
+border-red-500
+"
+>
 
-                    <span className="text-red-600 font-semibold">
-                      - {item.type}
-                    </span>
+<p className="text-gray-500">
+Total Pengeluaran
+</p>
 
-                  )
-                }
 
-              </td>
+<h2
+className="
+text-3xl
+font-bold
+text-red-600
+mt-3
+"
+>
+Rp {expense.toLocaleString("id-ID")}
+</h2>
 
 
-              <td className="text-right font-semibold">
+</div>
 
-                {
-                  item.type === "Pemasukan" ? (
 
-                    <span className="text-green-600">
-                      {item.amount}
-                    </span>
 
-                  ) : (
 
-                    <span className="text-red-600">
-                      {item.amount}
-                    </span>
+</div>
 
-                  )
-                }
 
 
-              </td>
 
 
-            </tr>
 
-          ))}
 
+<div
+className="
+mt-10
+bg-white
+rounded-2xl
+shadow-xl
+p-7
+"
+>
 
-          </tbody>
 
+<h2
+className="
+text-2xl
+font-bold
+mb-5
+"
+>
+Riwayat Transaksi
+</h2>
 
-        </table>
 
-        </div>
 
 
-      </div>
+<TransactionFilter
 
+filter={filter}
 
+setFilter={setFilter}
 
-    </main>
-  );
+/>
+
+
+
+
+
+
+
+<table
+className="
+w-full
+"
+>
+
+
+<thead>
+
+<tr
+className="
+border-b
+text-slate-700
+"
+>
+
+
+<th className="text-left py-3">
+Tanggal
+</th>
+
+
+<th className="text-left">
+Kategori
+</th>
+
+
+<th className="text-left">
+Jenis
+</th>
+
+
+<th className="text-right">
+Jumlah
+</th>
+
+
+</tr>
+
+</thead>
+
+
+
+
+
+<tbody>
+
+
+{
+filteredTransactions.map(
+(item,index)=>(
+
+
+<tr
+key={index}
+className="
+border-b
+hover:bg-slate-50
+"
+>
+
+
+<td className="py-4">
+{item.date}
+</td>
+
+
+<td>
+
+<span
+className="
+bg-blue-100
+text-blue-700
+px-3
+py-1
+rounded-full
+"
+>
+{item.category}
+</span>
+
+</td>
+
+
+
+<td>
+
+{
+item.type==="Pemasukan"
+
+?
+
+<span className="text-green-600 font-bold">
++ Pemasukan
+</span>
+
+:
+
+<span className="text-red-600 font-bold">
+- Pengeluaran
+</span>
+
+}
+
+</td>
+
+
+
+<td
+className="
+text-right
+font-bold
+"
+>
+
+Rp {item.amount.toLocaleString("id-ID")}
+
+</td>
+
+
+</tr>
+
+
+))
+
+
+}
+
+
+</tbody>
+
+
+</table>
+
+
+</div>
+
+
+</main>
+
+
+)
+
 }
