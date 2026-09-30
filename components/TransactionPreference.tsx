@@ -1,136 +1,47 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import Cookies from "js-cookie"
-
-
-
-export default function TransactionPreference(){
-
-
-const [limit,setLimit] = useState("5")
-
-
-
-useEffect(()=>{
-
-
-const saved =
-Cookies.get("transactionLimit")
-
-
-if(saved){
-
-setLimit(saved)
-
+interface Props {
+  limit: number
+  setLimit: (value: number) => void
+  order: string
+  setOrder: (value: string) => void
 }
 
+const selectClass =
+  "border border-slate-300 rounded-lg px-4 py-2 bg-white text-gray-800 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
 
-},[])
+export default function TransactionPreference({
+  limit,
+  setLimit,
+  order,
+  setOrder,
+}: Props) {
+  return (
+    <div className="bg-gray-50 border border-slate-200 rounded-xl p-4 mb-6 dark:bg-slate-800 dark:border-slate-700">
+      <p className="font-semibold text-gray-800 mb-3 dark:text-slate-100">
+        Preferensi Tampilan Transaksi
+      </p>
 
+      <div className="flex gap-4 flex-wrap">
+        <select
+          value={limit}
+          onChange={(e) => setLimit(Number(e.target.value))}
+          className={selectClass}
+        >
+          <option value={5}>5 transaksi</option>
+          <option value={10}>10 transaksi</option>
+          <option value={20}>20 transaksi</option>
+        </select>
 
-
-
-
-function changeLimit(value:string){
-
-
-setLimit(value)
-
-
-Cookies.set(
-
-"transactionLimit",
-
-value,
-
-{
-
-expires:30
-
-}
-
-)
-
-
-}
-
-
-
-
-return (
-
-<div
-
-className="
-bg-gray-50
-border
-rounded-xl
-p-4
-mb-6
-"
-
->
-
-
-<p
-className="
-font-semibold
-text-gray-800
-mb-2
-"
->
-Preferensi Tampilan Transaksi
-</p>
-
-
-
-<select
-
-
-value={limit}
-
-
-onChange={(e)=>
-changeLimit(e.target.value)
-}
-
-
-
-className="
-border
-rounded-lg
-px-4
-py-2
-text-gray-800
-"
-
->
-
-
-<option value="5">
-5 transaksi
-</option>
-
-
-<option value="10">
-10 transaksi
-</option>
-
-
-<option value="20">
-20 transaksi
-</option>
-
-
-
-</select>
-
-
-</div>
-
-
-)
-
-
+        <select
+          value={order}
+          onChange={(e) => setOrder(e.target.value)}
+          className={selectClass}
+        >
+          <option value="terbaru">Terbaru dulu</option>
+          <option value="terlama">Terlama dulu</option>
+        </select>
+      </div>
+    </div>
+  )
 }
