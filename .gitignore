@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# folder tool AI/Prisma (bukan bagian project)
+.agents/
+.claude/
+.cursor/
+.devin/
