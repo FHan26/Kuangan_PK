@@ -6,6 +6,7 @@ import Cookies from "js-cookie"
 import TransactionFilter from "@/components/TransactionFilter"
 import TransactionPreference from "@/components/TransactionPreference"
 import ThemeToggle from "@/components/ThemeToggle"
+import BudgetSummary from "@/components/BudgetSummary"
 
 export default function DashboardPage() {
   // DATA DUMMY (nanti diganti data asli dari database)
@@ -22,6 +23,7 @@ export default function DashboardPage() {
   const [limit, setLimit] = useState(5)
   const [order, setOrder] = useState("terbaru")
   const [theme, setTheme] = useState("light")
+  const [budget, setBudget] = useState(0)
 
   // BACA COOKIE PREFERENSI SAAT HALAMAN DIBUKA
   useEffect(() => {
@@ -33,6 +35,9 @@ export default function DashboardPage() {
     if (savedLimit) setLimit(Number(savedLimit))
     if (savedFilter) setFilter(savedFilter)
     if (savedOrder) setOrder(savedOrder)
+
+    const savedBudget = Cookies.get("budget")
+    if (savedBudget) setBudget(Number(savedBudget))
 
     if (savedTheme) {
       setTheme(savedTheme)
@@ -61,6 +66,11 @@ export default function DashboardPage() {
   function changeOrder(value: string) {
     setOrder(value)
     Cookies.set("transactionOrder", value, { expires: 30 })
+  }
+
+  function changeBudget(value: number) {
+    setBudget(value)
+    Cookies.set("budget", String(value), { expires: 30 })
   }
 
   function toggleTheme() {
@@ -139,6 +149,9 @@ export default function DashboardPage() {
           </span>
         </div>
       </div>
+
+      {/* RINGKASAN ANGGARAN (FR-12) */}
+      <BudgetSummary budget={budget} expense={expense} setBudget={changeBudget} />
 
       {/* RIWAYAT TRANSAKSI */}
       <div className="mt-10 bg-white rounded-2xl shadow-xl p-7 dark:bg-slate-900">
