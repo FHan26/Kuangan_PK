@@ -6,22 +6,27 @@ import Cookies from "js-cookie"
 import TransactionFilter from "@/components/TransactionFilter"
 import TransactionPreference from "@/components/TransactionPreference"
 import ThemeToggle from "@/components/ThemeToggle"
+import TransactionForm from "@/components/TransactionForm"
+
+type Transaction = {
+    id: number
+    tanggal: string
+    kategori: string
+    jenis: string
+    nominal: number
+    deskripsi: string | null
+}
 
 export default function DashboardPage() {
   // DATA DUMMY (nanti diganti data asli dari database)
-  const transactions = [
-    { date: "23 Sep 2026", category: "Makan", type: "Pengeluaran", amount: 75000 },
-    { date: "22 Sep 2026", category: "Akademik", type: "Pengeluaran", amount: 500000 },
-    { date: "20 Sep 2026", category: "Freelance", type: "Pemasukan", amount: 2500000 },
-    { date: "18 Sep 2026", category: "Skincare", type: "Pengeluaran", amount: 750000 },
-    { date: "15 Sep 2026", category: "Nongkrong", type: "Pengeluaran", amount: 150000 },
-    { date: "10 Sep 2026", category: "Bonus", type: "Pemasukan", amount: 1000000 },
-  ]
 
   const [filter, setFilter] = useState("SEMUA")
   const [limit, setLimit] = useState(5)
   const [order, setOrder] = useState("terbaru")
   const [theme, setTheme] = useState("light")
+  const [showTransactionForm, setShowTransactionForm] = useState(false)
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [loadingTransactions, setLoadingTransactions] = useState(true)
 
   // BACA COOKIE PREFERENSI SAAT HALAMAN DIBUKA
   useEffect(() => {
@@ -40,6 +45,46 @@ export default function DashboardPage() {
       // belum ada cookie: ikuti tema sistem
       setTheme("dark")
     }
+  }, [])
+
+        async function fetchTransactions() {
+    try {
+      const response = await fetch("/api/transactions")
+
+      if (!response.ok) {
+        throw new Error("Gagal mengambil transaksi")
+      }
+
+      const data = await response.json()
+
+      const formattedTransactions: Transaction[] = data.map(
+        (item: {
+          id: number
+          tanggal: string
+          kategori: string
+          jenis: string
+          nominal: string | number
+          deskripsi: string | null
+        }) => ({
+          id: item.id,
+          tanggal: item.tanggal,
+          kategori: item.kategori,
+          jenis: item.jenis,
+          nominal: Number(item.nominal),
+          deskripsi: item.deskripsi,
+        })
+      )
+
+      setTransactions(formattedTransactions)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setLoadingTransactions(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchTransactions()
   }, [])
 
   // TERAPKAN TEMA KE <html> SETIAP TEMA BERUBAH
@@ -76,24 +121,34 @@ export default function DashboardPage() {
   const filteredTransactions = sortedTransactions
     .filter((item) => {
       if (filter === "SEMUA") return true
-      if (filter === "PEMASUKAN") return item.type === "Pemasukan"
-      if (filter === "PENGELUARAN") return item.type === "Pengeluaran"
-      return item.category.toUpperCase() === filter
+      if (filter === "PEMASUKAN") return item.jenis === "Pemasukan"
+      if (filter === "PENGELUARAN") return item.jenis === "Pengeluaran"
+      return item.kategori.toUpperCase() === filter
     })
     .slice(0, limit)
 
   // HITUNG TOTAL
   const income = transactions
-    .filter((item) => item.type === "Pemasukan")
-    .reduce((sum, item) => sum + item.amount, 0)
+    .filter((item) => item.jenis === "Pemasukan")
+    .reduce((sum, item) => sum + item.nominal, 0)
 
   const expense = transactions
-    .filter((item) => item.type === "Pengeluaran")
-    .reduce((sum, item) => sum + item.amount, 0)
+    .filter((item) => item.jenis === "Pengeluaran")
+    .reduce((sum, item) => sum + item.nominal, 0)
 
   const balance = income - expense
 
   return (
+    <>
+    {showTransactionForm && (
+      <TransactionForm
+        onSuccess={async () => {
+          await fetchTransactions()
+          setShowTransactionForm(false)
+        }}
+        onCancel={() => setShowTransactionForm(false)}
+      />
+    )}
     <main className="min-h-screen bg-slate-100 p-8 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       {/* HEADER */}
       <div className="mb-8 flex justify-between items-start gap-4 flex-wrap">
@@ -144,7 +199,7 @@ export default function DashboardPage() {
       <div className="mt-10 bg-white rounded-2xl shadow-xl p-7 dark:bg-slate-900">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Riwayat Transaksi</h2>
-          <button className="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-xl font-semibold">
+          <button onClick={() => setShowTransactionForm(true)} className="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-xl font-semibold">
             + Tambah Transaksi
           </button>
         </div>
@@ -178,16 +233,22 @@ export default function DashboardPage() {
                   key={index}
                   className="border-b border-slate-200 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
                 >
-                  <td className="py-4">{item.date}</td>
+                  <td className="py-4">
+                    {new Date(item.tanggal).toLocaleDateString("id-ID", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                      })}
+                  </td>
 
                   <td>
                     <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-medium dark:bg-blue-900/40 dark:text-blue-300">
-                      {item.category}
+                      {item.kategori}
                     </span>
                   </td>
 
                   <td>
-                    {item.type === "Pemasukan" ? (
+                    {item.jenis === "Pemasukan" ? (
                       <span className="text-green-600 font-bold dark:text-green-400">
                         + Pemasukan
                       </span>
@@ -201,12 +262,12 @@ export default function DashboardPage() {
                   <td className="text-right font-bold">
                     <span
                       className={
-                        item.type === "Pemasukan"
+                        item.jenis === "Pemasukan"
                           ? "text-green-600 dark:text-green-400"
                           : "text-red-600 dark:text-red-400"
                       }
                     >
-                      Rp {item.amount.toLocaleString("id-ID")}
+                      Rp {item.nominal.toLocaleString("id-ID")}
                     </span>
                   </td>
                 </tr>
@@ -216,5 +277,6 @@ export default function DashboardPage() {
         </div>
       </div>
     </main>
+    </>
   )
 }

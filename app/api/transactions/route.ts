@@ -1,6 +1,32 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export async function GET() {
+  try {
+    // Sementara untuk development.
+    // Nanti diganti dengan userId dari session.
+    const userId = "dummy1";
+
+    const transactions = await prisma.transaction.findMany({
+      where: {
+        userId,
+      },
+      orderBy: {
+        tanggal: "desc",
+      },
+    });
+
+    return NextResponse.json(transactions);
+  } catch (error) {
+    console.error(error);
+
+    return NextResponse.json(
+      { error: "Gagal mengambil data transaksi." },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
